@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Smart TESTS</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+  <div class="pageContent">
+    <form action="">
+      <table class="questionform">
+        <tr>
+          <td>
+
+            <fieldset class="maketest">
+              <legend>Add NEW question</legend>
+              <label for="question">wright you question*:</label><br><textarea value="" id="question" rows="5"
+                class="form"></textarea><br>
+              <label for="correctanswer">right answer:</label><br><input type="text" value="" id="correctanswer"
+                class="form">
+              <input type="button" id="addcorrect" value="+"><br>
+              <label for="wronganswer">wrong answer:</label><br><input type="text" value="" id="wronganswer"
+                class="form">
+              <input type="button" id="addwrong" value="+"><br><br>
+              <label for="">Show in this question amount of:</label><br>
+              <label for="amountanswers">correct answers*: </label><input type="number" value="" id="amountanswers"
+                class="shortlabel">
+              <label for="wrongnumber">wrong answers*: </label><input type="number" value="" id="wrongnumber"
+                class="shortlabel">
+              <!--  <label for="mchoice">multiple choice</label><input type="checkbox" id="mchoice"> -->
+            </fieldset>
+
+          </td>
+          <td>
+            <fieldset id="ransw">
+              <legend style="color: blue;">Right answers</legend>
+              <ol class="ransw"></ol>
+            </fieldset>
+          </td>
+          <td>
+            <fieldset id="wansw">
+              <legend style="color: red;">Wrong answers</legend>
+              <ol class="wansw"></ol>
+            </fieldset>
+          </td>
+        </tr>
+      </table>
+      <input type="button" value="ADD" id="addq">
+      <br><br><input type="button" value="START the Test" class="start" id="starttest">
+    </form>
+
+    <h2 align="center" style="color: green;">TEST QUESTIONS</h2>
+    <ol class="test"></ol>
+
+  </div>
+
+  <div class="testContent">
+    <ol>
+
+    </ol>
+    <input type="button" value="CHECK ME" id="checkme" align="center">
+  </div>
+
+  <script>
+    let base = [          // main database
+      ["Choose fruits",
+        ["Apple", "banana", "plum", "pear", "peach", "cherry"],
+        ["potato", "currant", "cabbage", "eggplant", "tomato"],
+        {
+          amountanswers: 3,
+          wrongnumber: 1
+        }],
+
+      ["Choose nuts",
+        ["peanut", "cashews", "hazelnut", "almonds"],
+        ["sunflower seeds", "beans", "peas"],
+        {
+          amountanswers: 2,
+          wrongnumber: 1
+        }],
+
+      ["List the birds",
+        ["Eagle", "Raven", "Owl", "Dove", "Penguin", "Chicken", "Kiwi"],
+        ["Turtle", "Bee", "Kangaroo", "Bat"],
+        {
+          amountanswers: 3,
+          wrongnumber: 2
+        }]
+    ];
+
+    let test = document.querySelector(".test");
+    let wansw = document.querySelector(".wansw");
+    let ransw = document.querySelector(".ransw");
+
+    function randomSort(a, b) {    // function of random sorting
+      return Math.round(Math.random()) - 1; // answer will be 0 or -1
+    }
+
+    for (let i = 0; i < base.length; i++) {   // fill bottom question list data frome BASE
+      let li = document.createElement("li");
+      let edit = document.createElement("input");
+
+      li.innerHTML = base[i][0];
+      edit.className = "edit";
+      edit.value = "edit";
+      edit.type = "button";
+
+      li.appendChild(edit);
+      test.prepend(li);
+    }
+
+    let question = document.getElementById('question');
+
+    addcorrect.onclick = function () { // addming this answer to the appropriate list
+
+      let li = document.createElement('li');
+      li.className = "answersR";
+      li.innerHTML = correctanswer.value;
+      let deleteAnswer = document.createElement('input');
+      deleteAnswer.type = "button";
+      deleteAnswer.value = "-";
+      deleteAnswer.className = "del";
+
+
+      li.append(deleteAnswer);
+      ransw.append(li);
+      correctanswer.value = "";
+
+    }
+
+    addwrong.onclick = function () { // addming this answer to the appropriate list
+
+      let li = document.createElement('li');
+      li.className = "answersW"
+      li.innerHTML = wronganswer.value;
+      let deleteAnswer = document.createElement('input');
+      deleteAnswer.type = "button";
+      deleteAnswer.value = "-";
+      deleteAnswer.className = "del";
+
+
+      li.append(deleteAnswer);
+      wansw.append(li);
+      wronganswer.value = "";
+
+    }
+
+    let form = document.querySelector("form")
+    form.addEventListener("click", function (e) {
+      //      alert(e.target);
+      let target = e.target;
+      if (target.className == "del") {
+        target.parentElement.remove();
+      }
+
+    })
+
+    addq.onclick = function (e) { // add question to the database and bottom list
+
+      let newQuestion = [];
+      let settings = {};
+      let amountanswers = document.getElementById("amountanswers").value;
+      let wrongnumber = document.getElementById("wrongnumber");
+      let goodArr = [];
+      let goodAnswers = ransw.querySelectorAll(".answersR");
+      let badArr = [];
+      let badAnswers = wansw.querySelectorAll(".answersW");
+
+      newQuestion.push(question.value);
+      for (var i = 0; i < goodAnswers.length; i++) {    // make array of correct answers
+        goodArr[i] = goodAnswers[i].textContent;
+      }
+
+      for (var i = 0; i < badAnswers.length; i++) {   // make array of wrong answers
+        badArr[i] = badAnswers[i].textContent;
+      }
+
+      settings.amountanswers = +amountanswers;
+      settings.wrongnumber = +wrongnumber;
+      //     console.log(settings.amountanswers);
+
+
+      newQuestion.push(goodArr);
+      newQuestion.push(badArr);
+      base.push(newQuestion);
+
+
+      let li = document.createElement("li");
+      let edit = document.createElement("input");
+
+      li.innerHTML = question.value;
+      edit.className = "edit";
+      edit.value = "edit";
+      edit.type = "button";
+
+      li.appendChild(edit);
+      test.prepend(li);
+
+
+      ransw.innerHTML = "";
+      wansw.innerHTML = "";
+      question.value = "";
+      //     amountanswers.value = "";
+      //     wrongnumber.value = "";
+
+    }
+
+    test.onclick = function (e) { // edit button fill the fields in question form
+      let target = e.target;
+      if (target.className == "edit") {
+        let q = target.previousSibling.textContent;
+        question.value = q;
+        ransw.innerHTML = "";
+        wansw.innerHTML = "";
+
+        for (let i = 0; i < base.length; i++) {    // looking for a question in the database
+          if (base[i][0] == q) {
+            for (let x = 0; x < base[i][1].length; x++) {
+              let li = document.createElement('li');
+              li.className = "answersR";
+              li.innerHTML = base[i][1][x];
+              let deleteAnswer = document.createElement('input');
+              deleteAnswer.type = "button";
+              deleteAnswer.value = "-";
+              deleteAnswer.className = "del";
+
+              li.append(deleteAnswer);
+              ransw.append(li);
+            }
+
+            for (let y = 0; y < base[i][2].length; y++) {
+              let li = document.createElement('li');
+              li.className = "answersW";
+              li.innerHTML = base[i][2][y];
+              let deleteAnswer = document.createElement('input');
+              deleteAnswer.type = "button";
+              deleteAnswer.value = "-";
+              deleteAnswer.className = "del";
+
+              li.append(deleteAnswer);
+              wansw.append(li);
+            }
+            base.splice(i, 1);
+          };
+        }
+        target.parentElement.remove();
+      }
+    }
+
+    starttest.onclick = function () {
+      let pageContent = document.body.firstElementChild;
+      pageContent.style.display = "none";
+
+      let testContent = document.querySelector(".testContent");
+      testContent.style.display = "block";
+      testContent = testContent.firstElementChild;
+
+
+      for (let i = 0; i < base.length; i++) {   // random sorting right and wrong answers
+        base[i][1].sort(randomSort);
+        base[i][2].sort(randomSort);
+      }
+
+      base.sort(randomSort); // random questions sorting 
+
+
+      for (let x = 0; x < base.length; x++) {   // creating each question, iterate over the entire database
+        let li = document.createElement("li");
+        li.innerHTML = base[x][0] + "<br>";
+        let fieldset = document.createElement("fieldset");
+        let answersR = base[x][1].slice(0, base[x][3].amountanswers); // frome base we take X amoun of correct answers
+        let answersW = base[x][2].slice(0, base[x][3].wrongnumber); // frome base we take X amoun of wrong answers
+        let answersDb = answersR.concat(answersW);
+        answersDb.sort(randomSort); // random answers sorting 
+
+        for (let i = 0; i < answersDb.length; i++) {   // building DOM answers
+          let checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.id = answersDb[i];
+
+          let answ = document.createElement("label");
+          answ.setAttribute("for", answersDb[i]);
+          answ.innerHTML = answersDb[i];
+          fieldset.appendChild(checkbox);
+          fieldset.appendChild(answ);
+        }
+        li.appendChild(fieldset);
+        testContent.appendChild(li);
+      }
+
+    }
+
+    checkme.onclick = function () {   // get results of test
+      let testContent = document.querySelector(".testContent");
+      let li = testContent.querySelectorAll("li"); // questions blocks
+      let result = 0;
+
+      for (i = 0; i < li.length; i++) {   // sorting out questions        
+        let q = li[i].firstChild.textContent; //  text of questions
+        let checkAnsw = li[i].querySelectorAll("input");  // checkboxes of answers
+
+        for (let a = 0; a < checkAnsw.length; a++) {  // sorting out answers
+          //console.log(base[i][2].indexOf(checkAnsw[a].id));
+          if ((base[i][2].indexOf(checkAnsw[a].id) != -1 && checkAnsw[a].checked) || (base[i][1].indexOf(checkAnsw[a].id) != -1 && !checkAnsw[a].checked)) {
+            console.log(result);
+            result--;
+            break;
+          }
+        }
+        result++;
+      }
+      alert("You have " + result + " correct answers");
+    }
+
+
+
+  </script>
+
+
+
+</body>
+
+</html>
